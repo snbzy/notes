@@ -1,38 +1,13 @@
-# 一.安装docker
-## 1.手动安装dcoker
-```powershell
-# 0.更新yum
-yum update
+# Docker
 
-# 1.下载旧版本的docker
-yum remove docker docker-client docker-client-latest docker-common docker-latest \
-    docker-latest-logrotate docker-logrotate docker-engine
-    
-# 2. 安装所需的软件包。yum-utils 提供了 yum-config-manager，
-# 并且 device mapper 存储驱动程序需要 device-mapper-persistent-data 和 lvm2。
-yum install -y yum-utils device-mapper-persistent-data lvm2
-
-# 3.配置阿里云docker软件源
-yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-
-# 4.安装 Docker Engine-Community 如果提示您接受 GPG 密钥，请选是。
-yum install docker-ce docker-ce-cli containerd.io
-
-# 5.启动docker
-systemctl start docker
-
-# 6.设置开机启动
-systemctl enable docker
-
-# 7.验证安装成功
-docker version
-
-```
-
-## 2.使用脚本安装
+## 一.安装docker
 ```shell
- curl -fsSL https://get.docker.com -o get-docker.sh
- sudo sh get-docker.sh
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+# 启动docker
+systemctl start docker
+# 设置开机启动
+systemctl enable docker
 ```
 
 ### 2.1配置国内镜像源
@@ -62,7 +37,7 @@ ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
 
 `systemctl daemon-reload`
 `systemctl restart docker.service`
-## 3. docker-compose安装
+### 3.docker-compose安装
 ```shell
 
 curl -SL https://github.com/docker/compose/releases/download/v2.5.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
@@ -71,7 +46,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 ```
-# 二.常用命令
+## 二.常用命令
 > 1. docker官方文档:[https://docs.docker.com/engine/reference/commandline/run/](https://docs.docker.com/engine/reference/commandline/run/)
 
 ```powershell
@@ -135,7 +110,7 @@ docker rmi $(docker images | grep "none" | awk '{print $3}')
 > 在阿里云控制台添加过端口以后，创建容器可能会报错：iptables: No chain/target/match by that name
 > 此时应该重启docker容器
 
-## 安装Docker 报错公钥尚未安装
+> 安装Docker 报错公钥尚未安装
 cat /etc/redhat-release
 `rpm --import [http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7](https://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7)`
 
@@ -145,118 +120,9 @@ cat /etc/redhat-release
 docker tag nav-iamge:latest nav-iamge:old
 ```
 
-# 三.Linux常用命令
-```powershell
-#修改配置文件
-vi /etc/sysconfig/network-scripts/ifcfg-ens33
-
-# centos7
-service network restart
-
-# 安装netstat
-yum install net-tools
-
-# 查看端口
-netstat -tunlp | grep <端口>
-
-# 查看防火墙状态
-firewall-cmd --state
-
-# 停止/开启防火墙
-systemctl stop/start firewalld.service
-
-# 关闭/启用开机启动防火墙
-systemctl disable/enable firewalld.service
-
-#重启防火墙
-systemctl restart firewalld.service
-
-# 查询指定端口是否已开 yes表示开放 no表示未开放
-firewall-cmd --query-port=8080/tcp
-
-# 添加指定需要开放的端口
-firewall-cmd --add-port=8080/tcp --permanent
-firewall-cmd --add-port=8000-9999/tcp --permanent
-
-# 移除指定端口
-firewall-cmd --remove-port=8080/tcp --permanent 
-
-# 重启防火墙
-firewall-cmd --reload
-
-# linux 使用lrzsz(linux软件) 和Secure-CRT(windows软件)传输文件
-# 1.先在linux安装lrzsz
-yum install lrzsz
-# 1.1上传windows->linux:输入rz命令,Secure-CRT会弹出一个窗口选择文件
-rz
-# 1.2下载linux->windows:输入sz命令,
-# Secure-CRT默认保存路径设置Options -> Session Options -> Terminal -> Xmodem/Zmodem ->Directories
-sz /etc/docker/package-lock.json
 
 
-# cat 查看文件内容
-cat package.json
-
-# 测试请求web服务器的工具
-curl http://www.baidu.com
-
-# 查看进程
-ps aux
-
-# 终止进程
-kill [pid]
-
-# 查看port对应的pid两种方式：
-1. lsof -i:3010
-2. netstat -tunlp | grep 3010
-
-# 查看进场所在目录
-ls -l /proc/${pid}
-
-# 查看进程内存占用，按内存列排序
-top -o %MEM
-
-# 查看ssh最近登录成功记录
-last -f /var/log/wtmp
-
-# 查看ssh最近登录失败记录
-last -f /var/log/btmp
-
-# 清空登录记录
-cat /dev/null > /var/log/wtmp
-cat /dev/null > /var/log/btmp
-```
-
-2. linux目录结构
-   | /boot | 系统启动相关的文件，如内核、initrd，以及grub（BootLoader） |
-   | --- | --- |
-   | /etc | 配置文件 |
-   | /home | 用户的家目录，每一个用户的家目录通常默认为/home/USERNAME |
-   | /root | 管理员的家目录 |
-   | /lib | 库文件
-   静态库：单在程序中的库，其他程序不能使用该库文件
-   动态库：在内存中，任何用到该库的程序都可以使用
-   /lib/modules：内核模块文件 |
-   | /media | 挂载点目录，移动设备
-   （在windows中，插入一张光盘，系统会自动读取光盘，用户可以直接执行，但在linux中，插入光盘后需要在挂载点挂载这个设备之后才可以使用这个设备。） |
-   | /mnt | 挂载点目录，额外的临时文件系统 |
-   | /opt | 可选目录，第三方程序的安装目录 |
-   | /proc | 伪文件系统，内核映射文件 |
-   | /sys | 伪文件系统，跟硬件设备相关的属性映射文件 |
-   | /tmp | 临时文件，/var/tmp |
-   | /var | 可变化的文件，经常发生变化的文件 |
-   | /bin | 可执行文件，用户[命令](https://www.linuxcool.com/)
-   ；其中用到的库文件可能在/lib，配置文件可能在/etc |
-   | /sbin | 可执行文件，管理[命令](https://www.linuxcool.com/)
-   ；其中用到的库文件可能在/lib，配置文件可能在/etc |
-   | /usr | 只读文件，shared read-only
-   /usr/local：第三方软件 |
-
-# 
-# 
-
-
-# 五.问题处理
+## 五.问题处理
 ```powershell
 # 1. 输入ip addr看不到ip地址的问题
 vi ect/sysconfig/network-scripts
@@ -266,7 +132,7 @@ ONBOOT=no改为ONBOOT=yes
 
 ```
 
-# 六.docker数据卷
+## 六.docker数据卷
 如果你有一些需要持续更新的数据并且希望**持久化数据**，或者需要在不同的容器之间**共享数据**，再者需要主机与容器之间共享数据，那么你可以使用数据卷来满足这些需求
 ### 6.1数据卷定义
 数据卷是一个可供一个或多个容器使用的特殊目录,它绕过 UFS,可以提供很多有用的特性:

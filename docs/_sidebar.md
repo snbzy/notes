@@ -1,6 +1,6 @@
 - ☕ Java
 
-  - [Java基础](/java/Basic.md)
+  - [Java基础](cover.md)
   - [Java并发](/java/Thread.md)
   - [Java虚拟机](/java/JVM.md)
 
